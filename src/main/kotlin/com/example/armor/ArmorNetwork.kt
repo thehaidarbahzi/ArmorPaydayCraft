@@ -18,6 +18,7 @@ object ArmorNetwork {
             buf.writeBoolean(payload.isRecovering)
             buf.writeFloat(payload.recoveryProgress)
             buf.writeLong(payload.hitAnimationTime)
+            buf.writeBoolean(payload.isHealthDamage)
         },
         { buf ->
             ArmorSyncPayload(
@@ -25,7 +26,8 @@ object ArmorNetwork {
                 buf.readFloat(),
                 buf.readBoolean(),
                 buf.readFloat(),
-                buf.readLong()
+                buf.readLong(),
+                buf.readBoolean()
             )
         }
     )
@@ -35,7 +37,8 @@ object ArmorNetwork {
         val maxArmor: Float,
         val isRecovering: Boolean,
         val recoveryProgress: Float,
-        val hitAnimationTime: Long
+        val hitAnimationTime: Long,
+        val isHealthDamage: Boolean
     ) : CustomPacketPayload {
         override fun type(): CustomPacketPayload.Type<ArmorSyncPayload> = SYNC_TYPE
     }
@@ -47,7 +50,8 @@ object ArmorNetwork {
             maxArmor = state.maxArmor,
             isRecovering = state.isRecovering,
             recoveryProgress = state.recoveryProgress,
-            hitAnimationTime = state.hitAnimationTime
+            hitAnimationTime = state.hitAnimationTime,
+            isHealthDamage = state.lastHitHealthDamage
         )
         net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(player, payload)
     }

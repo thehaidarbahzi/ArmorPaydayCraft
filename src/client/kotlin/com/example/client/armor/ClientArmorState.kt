@@ -1,7 +1,6 @@
 package com.example.client.armor
 
 import net.minecraft.client.Minecraft
-import net.minecraft.world.entity.player.Player
 
 object ClientArmorState {
     var currentArmor: Float = 0f
@@ -9,6 +8,7 @@ object ClientArmorState {
     var isRecovering: Boolean = false
     var recoveryProgress: Float = 0f
     var hitAnimationTime: Long = 0L
+    var isHealthDamage: Boolean = false
 
     private var lastSyncedArmor: Float = 0f
     var isBlinking: Boolean = false
@@ -16,8 +16,7 @@ object ClientArmorState {
     var isShaking: Boolean = false
         private set
 
-    fun updateFromServer(current: Float, max: Float, recovering: Boolean, progress: Float, hitTime: Long) {
-        // Detect armor decrease for blink effect
+    fun updateFromServer(current: Float, max: Float, recovering: Boolean, progress: Float, hitTime: Long, healthDamage: Boolean) {
         if (current < lastSyncedArmor && lastSyncedArmor > 0f) {
             isBlinking = true
         }
@@ -27,6 +26,7 @@ object ClientArmorState {
         isRecovering = recovering
         recoveryProgress = progress
         hitAnimationTime = hitTime
+        isHealthDamage = healthDamage
 
         lastSyncedArmor = current
     }

@@ -18,7 +18,8 @@ object ArmorManager {
         var recoveryProgress: Float = 0f,
         var recoveryStartTime: Long = 0L,
         var recoveryStartArmor: Float = 0f,
-        var hitAnimationTime: Long = 0L
+        var hitAnimationTime: Long = 0L,
+        var lastHitHealthDamage: Boolean = false
     )
 
     fun getState(player: Player): PlayerArmorState {
@@ -71,10 +72,12 @@ object ArmorManager {
         if (state.currentArmor > 0f) {
             val absorbed = minOf(damage, state.currentArmor)
             state.currentArmor -= absorbed
+            state.lastHitHealthDamage = false
             syncToClient(player)
             return 0f
         }
 
+        state.lastHitHealthDamage = true
         return damage
     }
 
