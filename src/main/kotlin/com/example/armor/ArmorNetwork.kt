@@ -55,10 +55,4 @@ object ArmorNetwork {
         )
         net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(player, payload)
     }
-
-    fun sendToAllPlayers(server: net.minecraft.server.MinecraftServer) {
-        for (player in server.playerList.players) {
-            sendToPlayer(player)
-        }
-    }
 }

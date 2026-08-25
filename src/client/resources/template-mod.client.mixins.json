@@ -3,7 +3,6 @@
 	"package": "com.example.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"ExampleClientMixin",
 		"ArmorBarMixin"
 	],
 	"injectors": {

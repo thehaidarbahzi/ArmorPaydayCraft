@@ -32,6 +32,11 @@ bin/
 
 run/
 
+# reference / agent
+
+net/
+.agent/
+
 # java
 
 hs_err_*.log

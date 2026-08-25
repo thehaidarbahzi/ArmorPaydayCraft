@@ -20,8 +20,6 @@ object DamageIndicatorHud : HudElement {
         val player = mc.player ?: return
         val camera = mc.cameraEntity ?: return
 
-        DamageIndicatorState.tick()
-
         val indicators = DamageIndicatorState.getIndicators()
         if (indicators.isEmpty()) return
 

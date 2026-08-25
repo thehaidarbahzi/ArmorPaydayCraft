@@ -47,8 +47,4 @@ object ClientArmorState {
     }
 
     fun hasArmor(): Boolean = maxArmor > 0f
-
-    fun getArmorPercentage(): Float {
-        return if (maxArmor > 0) (currentArmor / maxArmor).coerceIn(0f, 1f) else 0f
-    }
 }

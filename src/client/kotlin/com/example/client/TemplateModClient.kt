@@ -3,6 +3,7 @@ package com.example.client
 import com.example.armor.ArmorNetwork
 import com.example.client.armor.ClientArmorState
 import com.example.client.armor.DamageIndicatorHud
+import com.example.client.armor.DamageIndicatorState
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
@@ -30,7 +31,10 @@ object TemplateModClient : ClientModInitializer {
 		}
 
 		// Tick client armor state every frame for animations
-		ClientTickEvents.END_CLIENT_TICK.register { ClientArmorState.tick() }
+		ClientTickEvents.END_CLIENT_TICK.register {
+			ClientArmorState.tick()
+			DamageIndicatorState.tick()
+		}
 
 		// Register damage indicator HUD element after crosshair
 		HudElementRegistry.attachElementAfter(

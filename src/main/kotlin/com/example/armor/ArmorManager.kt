@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 object ArmorManager {
     private val playerStates = ConcurrentHashMap<UUID, PlayerArmorState>()
-    private const val RECOVERY_DELAY_TICKS = 50L // 2.5 seconds at 20 TPS
-    private const val RECOVERY_DURATION_TICKS = 10L // 0.5 seconds at 20 TPS
+    private const val RECOVERY_DELAY_TICKS = 50L
+    private const val RECOVERY_DURATION_TICKS = 10L
 
     data class PlayerArmorState(
         var currentArmor: Float = 0f,
@@ -26,41 +26,39 @@ object ArmorManager {
         return playerStates.getOrPut(player.uuid) { PlayerArmorState() }
     }
 
-    fun calculateMaxArmor(player: Player): Float {
+    private fun calculateMaxArmor(player: Player): Float {
         return player.getArmorValue().toFloat()
     }
 
-    /**
-     * Returns depletion percent: 0.0 = full, 1.0 = empty
-     */
     private fun getDepletion(state: PlayerArmorState): Float {
         if (state.maxArmor <= 0f) return 0f
         return (1f - (state.currentArmor / state.maxArmor)).coerceIn(0f, 1f)
     }
 
+    private fun handleArmorChange(state: PlayerArmorState, player: Player): Boolean {
+        val newMax = calculateMaxArmor(player)
+        if (newMax == state.maxArmor) return false
+
+        val oldDepletion = getDepletion(state)
+        state.maxArmor = newMax
+
+        if (newMax > 0f) {
+            state.currentArmor = newMax * (1f - oldDepletion)
+            if (oldDepletion >= 1f) {
+                state.currentArmor = 0f
+                state.lastHitTime = player.level().gameTime
+            }
+        } else {
+            state.currentArmor = 0f
+        }
+        syncToClient(player)
+        return true
+    }
+
     fun absorbDamage(player: Player, damage: Float): Float {
         val state = getState(player)
-        val newMax = calculateMaxArmor(player)
+        handleArmorChange(state, player)
 
-        // Detect armor change (equip/unequip/swap)
-        if (newMax != state.maxArmor) {
-            val oldDepletion = getDepletion(state)
-            state.maxArmor = newMax
-
-            if (newMax > 0f) {
-                state.currentArmor = newMax * (1f - oldDepletion)
-                // If was fully depleted, force recovery delay
-                if (oldDepletion >= 1f) {
-                    state.currentArmor = 0f
-                    state.lastHitTime = player.level().gameTime
-                }
-            } else {
-                state.currentArmor = 0f
-            }
-            syncToClient(player)
-        }
-
-        // Reset recovery if hit
         if (state.isRecovering) {
             state.isRecovering = false
             state.recoveryProgress = 0f
@@ -83,27 +81,8 @@ object ArmorManager {
 
     fun tick(player: Player) {
         val state = getState(player)
-        val oldMax = state.maxArmor
-        val newMax = calculateMaxArmor(player)
+        handleArmorChange(state, player)
 
-        // Detect armor change (equip/unequip/swap)
-        if (newMax != oldMax) {
-            val oldDepletion = getDepletion(state)
-            state.maxArmor = newMax
-
-            if (newMax > 0f) {
-                state.currentArmor = newMax * (1f - oldDepletion)
-                if (oldDepletion >= 1f) {
-                    state.currentArmor = 0f
-                    state.lastHitTime = player.level().gameTime
-                }
-            } else {
-                state.currentArmor = 0f
-            }
-            syncToClient(player)
-        }
-
-        // No armor equipped — clear and sync
         if (state.maxArmor <= 0f) {
             if (state.currentArmor != 0f || state.isRecovering) {
                 state.currentArmor = 0f
@@ -114,10 +93,7 @@ object ArmorManager {
             return
         }
 
-        // Already full and not recovering — nothing to do
-        if (state.currentArmor >= state.maxArmor && !state.isRecovering) {
-            return
-        }
+        if (state.currentArmor >= state.maxArmor && !state.isRecovering) return
 
         val currentTime = player.level().gameTime
         val ticksSinceLastHit = currentTime - state.lastHitTime

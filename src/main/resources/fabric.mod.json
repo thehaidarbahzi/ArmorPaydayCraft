@@ -2,14 +2,13 @@
 	"schemaVersion": 1,
 	"id": "template-mod",
 	"version": "${version}",
-	"name": "Template Mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Payday 2 Armor System",
+	"description": "Payday 2-style armor system: armor absorbs all damage, depletes on hit, recovers after delay. Includes directional damage indicator.",
 	"authors": [
-		"Me!"
+		"haidarbahzi"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://github.com/haidarbahzi/template-mod"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/template-mod/icon.png",
