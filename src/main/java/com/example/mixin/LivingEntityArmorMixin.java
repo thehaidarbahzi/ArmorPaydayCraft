@@ -21,7 +21,7 @@ public abstract class LivingEntityArmorMixin {
             return;
         }
 
-        if (damageSource.is(DamageTypeTags.BYPASSES_ARMOR)) {
+        if (damageSource.is(DamageTypeTags.BYPASSES_ARMOR) && !damageSource.is(DamageTypeTags.IS_FIRE) && !damageSource.is(DamageTypeTags.IS_FALL)) {
             return;
         }
 

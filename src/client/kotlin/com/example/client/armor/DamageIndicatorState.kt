@@ -1,6 +1,7 @@
 package com.example.client.armor
 
 import net.minecraft.client.Minecraft
+import net.minecraft.tags.DamageTypeTags
 
 object DamageIndicatorState {
     data class Indicator(val worldYaw: Float, val creationTick: Long, val isHealthDamage: Boolean)
@@ -19,7 +20,12 @@ object DamageIndicatorState {
 
         if (player.hurtTime > 0 && player.hurtTime > lastCapturedHurtTime) {
             val worldYaw = player.hurtDir + camera.yRot + 180f
-            val healthDamage = ClientArmorState.currentArmor <= 0f
+            val source = player.lastDamageSource
+            val healthDamage = if (source != null) {
+                (source.`is`(DamageTypeTags.BYPASSES_ARMOR) && !source.`is`(DamageTypeTags.IS_FIRE) && !source.`is`(DamageTypeTags.IS_FALL)) || ClientArmorState.currentArmor <= 0f
+            } else {
+                ClientArmorState.currentArmor <= 0f
+            }
             indicators.add(Indicator(worldYaw, currentTime, healthDamage))
             lastCapturedHurtTime = player.hurtTime
         }
