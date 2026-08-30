@@ -1,3 +1,5 @@
+<img src=".github/assets/icon.png" alt="Mod Icon" width="128" />
+
 # ArmorPaydayCraft
 
 A Minecraft mod that replaces vanilla armor with Payday 2's armor system. Armor works as a complete damage shield, not a percentage reduction.
